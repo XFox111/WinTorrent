@@ -1,0 +1,33 @@
+﻿<Application
+    x:Class="WinTorrent.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+	<Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/TemplateDictionaries/AutoSuggestBoxTemplateDictionary.xaml"/>
+				<ResourceDictionary Source="/TemplateDictionaries/NavigationViewItemTemplateDictionary.xaml"/>
+				<ResourceDictionary Source="/TemplateDictionaries/ListViewItemTemplateDictionary.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+            <Color x:Key="SystemAccentColor">DeepSkyBlue</Color>
+
+			<Style TargetType="Button" BasedOn="{StaticResource ButtonRevealStyle}">
+				<Setter Property="BorderThickness" Value="1"/>
+				<Setter Property="CornerRadius" Value="2"/>
+			</Style>
+
+			<Style TargetType="NavigationViewItem">
+				<Setter Property="Foreground" Value="{ThemeResource SystemChromeGrayColor}"/>
+			</Style>
+			
+			<Style TargetType="TextBox">
+				<Setter Property="CornerRadius" Value="2"/>
+			</Style>
+			
+			<Style TargetType="ComboBox">
+				<Setter Property="CornerRadius" Value="2"/>
+			</Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
