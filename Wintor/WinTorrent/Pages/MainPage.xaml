@@ -4,18 +4,23 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:models="using:WinTorrent.Models"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:converters="using:WinTorrent.ValueConverters"
+	xmlns:client="using:MonoTorrent.Client"
+	xmlns:models="using:WinTorrent.Models"
 	mc:Ignorable="d">
 
 	<Page.Resources>
 		<ThemeShadow x:Name="sharedShadow"/>
+		<converters:TorrentStateValueConverter x:Name="stateConverter"/>
+		<converters:EstimatesValueConverter x:Name="etaConverter"/>
 	</Page.Resources>
 
 	<Grid>
 		<Grid.BackgroundTransition>
 			<BrushTransition/>
 		</Grid.BackgroundTransition>
-		
+
 		<Grid.RowDefinitions>
 			<RowDefinition Height="32"/>
 			<RowDefinition/>
@@ -101,172 +106,13 @@
 			</ListView.ItemContainerStyle>
 
 			<ListView.ItemTemplate>
-				<DataTemplate x:DataType="models:TorrentItem">
+				<DataTemplate x:DataType="client:TorrentManager">
 					<UserControl>
 						<Grid>
+							<Grid.Resources>
+								<SolidColorBrush x:Name="SystemAccentColorBrush" Color="{StaticResource SystemAccentColor}"/>
+							</Grid.Resources>
 							<VisualStateManager.VisualStateGroups>
-								<VisualStateGroup x:Name="TorentStateGroup">
-									<VisualState x:Name="Initializing">
-										<VisualState.StateTriggers>
-											<models:TorrentStateDataTrigger TargetElement="{x:Bind}" TargetState="Initializing"/>
-										</VisualState.StateTriggers>
-										<VisualState.Setters>
-											<Setter Target="StatusIcon.Symbol" Value="Clock"/>
-
-											<Setter Target="StatusLabel.Text" Value="Initializing"/>
-
-											<Setter Target="SpeedLabel.Visibility" Value="Collapsed"/>
-											<Setter Target="ProgressLabel.Visibility" Value="Collapsed"/>
-											<Setter Target="EtaLabel.Visibility" Value="Collapsed"/>
-											<Setter Target="PauseButton.Visibility" Value="Collapsed"/>
-
-											<Setter Target="StatusIcon.Foreground" Value="Orange"/>
-											<Setter Target="StatusLabel.Foreground" Value="Orange"/>
-											<Setter Target="ProgressBar.Foreground" Value="Orange"/>
-
-											<Setter Target="ProgressBar.IsIndeterminate" Value="True"/>
-										</VisualState.Setters>
-									</VisualState>
-									<VisualState x:Name="Downloading"/>
-									<VisualState x:Name="Cancelling">
-										<VisualState.StateTriggers>
-											<models:TorrentStateDataTrigger TargetElement="{x:Bind}" TargetState="Cancelling"/>
-										</VisualState.StateTriggers>
-										<VisualState.Setters>
-											<Setter Target="StatusIcon.Symbol" Value="Clear"/>
-
-											<Setter Target="StatusLabel.Text" Value="Cancelling"/>
-
-											<Setter Target="SpeedLabel.Visibility" Value="Collapsed"/>
-											<Setter Target="ProgressLabel.Visibility" Value="Collapsed"/>
-											<Setter Target="EtaLabel.Visibility" Value="Collapsed"/>
-											<Setter Target="PauseButton.Visibility" Value="Collapsed"/>
-
-											<Setter Target="StatusIcon.Foreground" Value="Orange"/>
-											<Setter Target="StatusLabel.Foreground" Value="Orange"/>
-											<Setter Target="ProgressBar.Foreground" Value="Orange"/>
-
-											<Setter Target="ProgressBar.IsIndeterminate" Value="True"/>
-										</VisualState.Setters>
-									</VisualState>
-									<VisualState x:Name="Pausing">
-										<VisualState.StateTriggers>
-											<models:TorrentStateDataTrigger TargetElement="{x:Bind}" TargetState="Pausing"/>
-										</VisualState.StateTriggers>
-										<VisualState.Setters>
-											<Setter Target="StatusIcon.Symbol" Value="Pause"/>
-
-											<Setter Target="StatusLabel.Text" Value="Pausing"/>
-
-											<Setter Target="PauseButton.Visibility" Value="Collapsed"/>
-
-											<Setter Target="StatusIcon.Foreground" Value="Gray"/>
-											<Setter Target="StatusLabel.Foreground" Value="Gray"/>
-											<Setter Target="ProgressBar.Foreground" Value="Gray"/>
-
-											<Setter Target="ProgressBar.IsIndeterminate" Value="True"/>
-										</VisualState.Setters>
-									</VisualState>
-									<VisualState x:Name="Paused">
-										<VisualState.StateTriggers>
-											<models:TorrentStateDataTrigger TargetElement="{x:Bind}" TargetState="Paused"/>
-										</VisualState.StateTriggers>
-										<VisualState.Setters>
-											<Setter Target="StatusIcon.Symbol" Value="Pause"/>
-											<Setter Target="PauseButtonIcon.Symbol" Value="Play"/>
-
-											<Setter Target="StatusLabel.Text" Value="Paused"/>
-
-											<Setter Target="SpeedLabel.Visibility" Value="Collapsed"/>
-											<Setter Target="ProgressLabel.Visibility" Value="Collapsed"/>
-											<Setter Target="EtaLabel.Visibility" Value="Collapsed"/>
-
-											<Setter Target="StatusIcon.Foreground" Value="Gray"/>
-											<Setter Target="StatusLabel.Foreground" Value="Gray"/>
-											<Setter Target="ProgressBar.Foreground" Value="Gray"/>
-										</VisualState.Setters>
-									</VisualState>
-									<VisualState x:Name="Resuming">
-										<VisualState.StateTriggers>
-											<models:TorrentStateDataTrigger TargetElement="{x:Bind}" TargetState="Resuming"/>
-										</VisualState.StateTriggers>
-										<VisualState.Setters>
-											<Setter Target="StatusIcon.Symbol" Value="Clock"/>
-
-											<Setter Target="StatusLabel.Text" Value="Resuming"/>
-
-											<Setter Target="SpeedLabel.Visibility" Value="Collapsed"/>
-											<Setter Target="ProgressLabel.Visibility" Value="Collapsed"/>
-											<Setter Target="EtaLabel.Visibility" Value="Collapsed"/>
-											<Setter Target="PauseButton.Visibility" Value="Collapsed"/>
-
-											<Setter Target="ProgressBar.IsIndeterminate" Value="True"/>
-										</VisualState.Setters>
-									</VisualState>
-									<VisualState x:Name="Completed">
-										<VisualState.StateTriggers>
-											<models:TorrentStateDataTrigger TargetElement="{x:Bind}" TargetState="Completed"/>
-										</VisualState.StateTriggers>
-										<VisualState.Setters>
-											<Setter Target="StatusIcon.Symbol" Value="Accept"/>
-											<Setter Target="PauseButtonIcon.Symbol" Value="Globe"/>
-											<Setter Target="PauseButton.(ToolTipService.ToolTip)" Value="Seed torrent"/>
-
-											<Setter Target="StatusLabel.Text" Value="Completed"/>
-
-											<Setter Target="SpeedLabel.Visibility" Value="Collapsed"/>
-											<Setter Target="ProgressLabel.Visibility" Value="Collapsed"/>
-											<Setter Target="EtaLabel.Visibility" Value="Collapsed"/>
-
-											<Setter Target="StatusIcon.Foreground" Value="#5b5"/>
-											<Setter Target="StatusLabel.Foreground" Value="#5b5"/>
-											<Setter Target="ProgressBar.Foreground" Value="#5b5"/>
-
-											<Setter Target="ProgressBar.Value" Value="100"/>
-										</VisualState.Setters>
-									</VisualState>
-									<VisualState x:Name="Seeding">
-										<VisualState.StateTriggers>
-											<models:TorrentStateDataTrigger TargetElement="{x:Bind}" TargetState="Seeding"/>
-										</VisualState.StateTriggers>
-										<VisualState.Setters>
-											<Setter Target="StatusIcon.Symbol" Value="Upload"/>
-
-											<Setter Target="StatusLabel.Text" Value="Seeding"/>
-
-											<Setter Target="ProgressLabel.Visibility" Value="Collapsed"/>
-											<Setter Target="EtaLabel.Visibility" Value="Collapsed"/>
-											<Setter Target="PauseButton.Visibility" Value="Collapsed"/>
-
-											<Setter Target="StatusIcon.Foreground" Value="#5b5"/>
-											<Setter Target="StatusLabel.Foreground" Value="#5b5"/>
-											<Setter Target="ProgressBar.Foreground" Value="#5b5"/>
-
-											<Setter Target="ProgressBar.Value" Value="1"/>
-										</VisualState.Setters>
-									</VisualState>
-									<VisualState x:Name="Error">
-										<VisualState.StateTriggers>
-											<models:TorrentStateDataTrigger TargetElement="{x:Bind}" TargetState="Error"/>
-										</VisualState.StateTriggers>
-										<VisualState.Setters>
-											<Setter Target="StatusIcon.Symbol" Value="Clear"/>
-											<Setter Target="PauseButtonIcon.Symbol" Value="RepeatAll"/>
-											<Setter Target="PauseButton.(ToolTipService.ToolTip)" Value="Retry"/>
-
-											<Setter Target="StatusLabel.Text" Value="Error"/>
-
-											<Setter Target="SpeedLabel.Visibility" Value="Collapsed"/>
-											<Setter Target="ProgressLabel.Visibility" Value="Collapsed"/>
-											<Setter Target="EtaLabel.Visibility" Value="Collapsed"/>
-											<Setter Target="PauseButton.Visibility" Value="Visible"/>
-
-											<Setter Target="StatusIcon.Foreground" Value="Red"/>
-											<Setter Target="StatusLabel.Foreground" Value="Red"/>
-											<Setter Target="ProgressBar.Foreground" Value="Red"/>
-										</VisualState.Setters>
-									</VisualState>
-								</VisualStateGroup>
 								<VisualStateGroup x:Name="CommonStates">
 									<VisualState x:Name="Normal">
 										<VisualState.Storyboard>
@@ -309,24 +155,45 @@
 									<ColumnDefinition Width="Auto"/>
 								</Grid.ColumnDefinitions>
 
-								<TextBlock Grid.Row="0" Grid.ColumnSpan="4" Text="{Binding Title}" MaxLines="1" TextTrimming="CharacterEllipsis"/>
+								<TextBlock Grid.Row="0" Grid.ColumnSpan="4" Text="{Binding Path=Torrent.Name}" MaxLines="1" TextTrimming="CharacterEllipsis"/>
 
-								<SymbolIcon x:Name="StatusIcon" Grid.Row="1" Grid.Column="0" Symbol="Download" Foreground="{StaticResource SystemAccentColor}" />
-								<TextBlock x:Name="StatusLabel" Grid.Row="1" Grid.Column="1" Text="Downloading" Foreground="{StaticResource SystemAccentColor}"/>
-								<TextBlock x:Name="SpeedLabel" Grid.Row="1" Grid.Column="2" Text="{Binding TransmissionSpeed}" Foreground="Gray"/>
-								<TextBlock x:Name="ProgressLabel" Grid.Row="1" Grid.Column="3" Foreground="Gray">
-									<Run Text="{Binding Downloaded}"/> of <Run Text="{Binding TotalSize}"/>
-								</TextBlock>
-								<TextBlock x:Name="EtaLabel" Grid.Row="1" Grid.Column="4" Foreground="Gray">
-									<Run Text="{Binding RemainingTime}"/> remaining
+								<FontIcon Grid.Row="1" Grid.Column="0" 
+										  Glyph="{Binding Path=State, Converter={StaticResource stateConverter}, ConverterParameter=StatusIcon}" 
+										  Foreground="{Binding Path=State, Converter={StaticResource stateConverter}, ConverterParameter=AccentColor}" />
+
+								<TextBlock Grid.Row="1" Grid.Column="1" 
+										   Text="{Binding Path=State, Converter={StaticResource stateConverter}, ConverterParameter=StatusLabel}"
+										   Foreground="{Binding Path=State, Converter={StaticResource stateConverter}, ConverterParameter=AccentColor}" />
+
+								<TextBlock Grid.Row="1" Grid.Column="2" Foreground="Gray"
+										   Text="{Binding Path=Error.Exception.Message}"
+										   Visibility="{Binding Path=State, Converter={StaticResource stateConverter}, ConverterParameter=ErrorVisibility, TargetNullValue=Collapsed}"/>
+								
+								<TextBlock Grid.Row="1" Grid.Column="2" Foreground="Gray"
+										   Text="{Binding Path=Monitor.DownloadSpeed, TargetNullValue={Binding Path=Monitor.UploadSpeed}}"
+										   Visibility="{Binding Path=State, Converter={StaticResource stateConverter}, ConverterParameter=StatsVisibility, TargetNullValue=Collapsed}"/>
+
+								<TextBlock Grid.Row="1" Grid.Column="3" Foreground="Gray"
+										   Visibility="{Binding Path=State, Converter={StaticResource stateConverter}, ConverterParameter=StatsVisibility, TargetNullValue=Collapsed}">
+									<Run Text="{Binding Path=Monitor.DataBytesDownloaded}"/> of <Run Text="{Binding Path=Torrent.Size}"/>
 								</TextBlock>
 
-								<Button x:Name="PauseButton" Grid.Column="5" Grid.RowSpan="2" Background="Transparent" Height="50" Width="50" Opacity="0" Tag="{Binding}" Click="PauseItem">
-									<SymbolIcon x:Name="PauseButtonIcon" Symbol="Pause"/>
+								<TextBlock Grid.Row="1" Grid.Column="4" Foreground="Gray"
+										   Visibility="{Binding Path=State, Converter={StaticResource stateConverter}, ConverterParameter=StatsVisibility, TargetNullValue=Collapsed}">
+									<Run Text="{Binding Converter={StaticResource etaConverter}}"/> remaining
+								</TextBlock>
+
+								<Button Grid.Column="5" Grid.RowSpan="2" Background="Transparent" Height="50" Width="50" Tag="{Binding}" Opacity="0" Click="PauseItem"
+										Visibility="{Binding Path=State, Converter={StaticResource stateConverter}, ConverterParameter=PauseButtonVisibility, TargetNullValue=Collapsed}"
+										ToolTipService.ToolTip="{Binding Path=State, Converter={StaticResource stateConverter}, ConverterParameter=PauseButtonTooltip}">
+									<FontIcon Glyph="{Binding Path=State, Converter={StaticResource stateConverter}, ConverterParameter=PauseButtonIcon}"/>
 								</Button>
 							</Grid>
 
-							<ProgressBar x:Name="ProgressBar" Grid.Row="2" Grid.ColumnSpan="4" Height="3" Value="{Binding Progress}" Background="Transparent" Maximum="1" Minimum="0"/>
+							<ProgressBar Grid.Row="2" Grid.ColumnSpan="4" Height="3" Background="Transparent" Maximum="1" Minimum="0"
+										 Value="{Binding Path=State, Converter={StaticResource stateConverter}, ConverterParameter=ProgressValue, TargetNullValue={Binding Progress}}"
+										 IsIndeterminate="{Binding Path=State, Converter={StaticResource stateConverter}, ConverterParameter=ProgressIndeterminate}"
+										 Foreground="{Binding Path=State, Converter={StaticResource stateConverter}, ConverterParameter=AccentColor, TargetNullValue=False}" />
 						</Grid>
 					</UserControl>
 				</DataTemplate>

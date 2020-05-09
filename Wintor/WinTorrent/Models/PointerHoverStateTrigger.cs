@@ -1,4 +1,5 @@
-﻿using Windows.UI.Xaml;
+﻿using MonoTorrent.Client;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using WinTorrent.Pages;
 
@@ -6,7 +7,7 @@ namespace WinTorrent.Models
 {
 	class PointerHoverStateTrigger : StateTriggerBase
 	{
-		public TorrentItem TargetItem
+		public TorrentManager TargetItem
 		{
 			get => _targetItem;
 			set
@@ -26,7 +27,7 @@ namespace WinTorrent.Models
 				_targetElement.PointerExited += PointerExited;
 			}
 		}
-		private TorrentItem _targetItem;
+		private TorrentManager _targetItem;
 		private FrameworkElement _targetElement;
 
 		private void PointerExited(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e) =>

@@ -123,9 +123,9 @@
     <Compile Include="Dialogs\AddTorrentDialog.xaml.cs">
       <DependentUpon>AddTorrentDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Models\DataSize.cs" />
     <Compile Include="Models\PointerHoverStateTrigger.cs" />
-    <Compile Include="Models\TorrentStateDataTrigger.cs" />
+    <Compile Include="Models\TorrentMetadataInfo.cs" />
+    <Compile Include="Models\TorrentStateValuesEntry.cs" />
     <Compile Include="Pages\TorrentDetailsPage.xaml.cs">
       <DependentUpon>TorrentDetailsPage.xaml</DependentUpon>
     </Compile>
@@ -141,7 +141,8 @@
     <Compile Include="Utils\Metrics.cs" />
     <Compile Include="Utils\Settings.cs" />
     <Compile Include="Utils\TorrentClient.cs" />
-    <Compile Include="Models\TorrentItem.cs" />
+    <Compile Include="ValueConverters\TorrentStateValueConverter.cs" />
+    <Compile Include="ValueConverters\EstimatesValueConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -264,6 +265,9 @@
     <SDKReference Include="Microsoft.VCLibs, Version=14.0">
       <Name>Visual C++ 2015 Runtime for Universal Windows Platform Apps</Name>
     </SDKReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Controls\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

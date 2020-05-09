@@ -1,10 +1,13 @@
-﻿using System;
+﻿using MonoTorrent.Client;
+using System;
+using System.IO;
+using Windows.Storage;
+using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 using WinTorrent.Dialogs;
-using WinTorrent.Models;
 using WinTorrent.Utils;
 
 namespace WinTorrent.Pages
@@ -19,7 +22,9 @@ namespace WinTorrent.Pages
 			search.Translation += new System.Numerics.Vector3(0, 0, 10);
 
 			navigationList.SelectedIndex = 0;
-			TorrentClient.TorrentItemStateChanged += (s, e) => NavigationViewList_SelectionChanged(this, null);
+
+			//File.Create("E://FUCKYOU.txt");
+			//File.WriteAllText("E://FUCKYOU.txt", "FUCK YOU!");
 		}
 
 		protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -32,17 +37,27 @@ namespace WinTorrent.Pages
 		private void OpenSettings(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) =>
 			Frame.Navigate(typeof(SettingsPage), null, new SlideNavigationTransitionInfo { Effect = SlideNavigationTransitionEffect.FromLeft });
 
-		private async void AddTorrent(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) =>
-			await new AddTorrentDialog().ShowAsync();
+		private async void AddTorrent(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
+		{
+			AddTorrentDialog addDialog = new AddTorrentDialog();
+			await addDialog.ShowAsync();
+
+			if (addDialog.Torrent == null)
+				return;
+
+			TorrentClient.AddTorrent(addDialog.Torrent, addDialog.DestinationFolder);
+
+			// TODO: Configure torrent
+		}
 
 		private void NavigationViewList_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			list.ItemsSource = (navigationList.SelectedItem as NavigationViewItem)?.Tag as string switch
 			{
-				"downloading" => TorrentClient.Torrents.FindAll(i => i.State.BelongsTo(TorrentState.Downloading, TorrentState.Cancelling, TorrentState.Error, TorrentState.Initializing, TorrentState.Pausing)),
+				"downloading" => TorrentClient.Torrents.FindAll(i => i.State.BelongsTo(TorrentState.Downloading, TorrentState.Hashing, TorrentState.Error, TorrentState.Metadata, TorrentState.Starting, TorrentState.Stopping)),
 				"seeding" => TorrentClient.Torrents.FindAll(i => i.State.BelongsTo(TorrentState.Seeding)),
-				"completed" => TorrentClient.Torrents.FindAll(i => i.State.BelongsTo(TorrentState.Completed, TorrentState.Seeding)),
-				"paused" => TorrentClient.Torrents.FindAll(i => i.State.BelongsTo(TorrentState.Paused, TorrentState.Resuming)),
+				"completed" => TorrentClient.Torrents.FindAll(i => i.State.BelongsTo(TorrentState.Stopped, TorrentState.Seeding)),
+				"paused" => TorrentClient.Torrents.FindAll(i => i.State.BelongsTo(TorrentState.Paused, TorrentState.HashingPaused)),
 				_ => TorrentClient.Torrents
 			};
 			search.ItemsSource = null;
@@ -56,8 +71,8 @@ namespace WinTorrent.Pages
 			sender.ItemsSource = null;
 			navigationList.SelectedIndex = 0;
 			var result = TorrentClient.Torrents.FindAll(i =>
-					i.Title.ToLowerInvariant().Contains(sender.Text.ToLowerInvariant()) ||
-					(i.Files?.Path.ToLowerInvariant().Contains(sender.Text.ToLowerInvariant()) ?? false) ||
+					i.Torrent.Name.ToLowerInvariant().Contains(sender.Text.ToLowerInvariant()) ||
+					(i?.SavePath.ToLowerInvariant().Contains(sender.Text.ToLowerInvariant()) ?? false) ||
 					i.State.ToString().ToLowerInvariant().Contains(sender.Text.ToLowerInvariant()));
 
 			list.ItemsSource = result;
@@ -88,12 +103,12 @@ namespace WinTorrent.Pages
 		}
 
 		private void list_ItemClick(object sender, ItemClickEventArgs e) =>
-			OpenItem(e.ClickedItem as TorrentItem);
+			OpenItem(e.ClickedItem as TorrentManager);
 
 		private void ViewItem(object sender, RoutedEventArgs e) =>
-			OpenItem(list.ItemFromContainer(((sender as FrameworkElement).Parent as FrameworkElement).Parent) as TorrentItem);
+			OpenItem(list.ItemFromContainer(((sender as FrameworkElement).Parent as FrameworkElement).Parent) as TorrentManager);
 
-		private void OpenItem(TorrentItem item)
+		private void OpenItem(TorrentManager item)
 		{
 			if (list.ContainerFromItem(item) as ListViewItem != null)
 				list.PrepareConnectedAnimation("ca1", item, "caTarget");

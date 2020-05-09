@@ -62,7 +62,7 @@ namespace WinTorrent.Utils
 		public static async Task<StorageFolder> GetDefaultFolder()
 		{
 			if (string.IsNullOrWhiteSpace(DefaultFolder))
-				return await DownloadsFolder.CreateFolderAsync(Package.Current.DisplayName, CreationCollisionOption.OpenIfExists);
+				return null;
 			else
 				return await StorageApplicationPermissions.FutureAccessList.GetFolderAsync(DefaultFolder);
 		}

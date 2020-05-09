@@ -1,4 +1,5 @@
-﻿using Windows.UI.Xaml;
+﻿using MonoTorrent.Client;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
@@ -8,7 +9,7 @@ namespace WinTorrent.Pages
 {
 	public sealed partial class TorrentDetailsPage : Page
 	{
-		public TorrentItem Item { get; private set; }
+		public TorrentManager Item { get; private set; }
 
 		public TorrentDetailsPage()
 		{
@@ -20,7 +21,7 @@ namespace WinTorrent.Pages
 		{
 			base.OnNavigatedTo(e);
 
-			Item = e.Parameter as TorrentItem;
+			Item = e.Parameter as TorrentManager;
 
 			if (ConnectedAnimationService.GetForCurrentView().GetAnimation("ca1") is ConnectedAnimation animation)
 				animation.TryStart(caTarget);
